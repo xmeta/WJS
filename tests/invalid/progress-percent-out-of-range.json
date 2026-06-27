@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "wbs-invalid-progress",
+  "name": "Invalid Progress",
+  "rootId": "node-root",
+  "nodes": [
+    {
+      "id": "node-root",
+      "parentId": null,
+      "code": "1",
+      "name": "Project",
+      "type": "deliverable",
+      "progressPercent": 120
+    }
+  ],
+  "relations": [],
+  "resources": [],
+  "artifacts": []
+}

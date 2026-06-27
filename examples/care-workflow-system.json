@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "wbs-care-workflow-system",
+  "name": "Care Workflow Support System WBS",
+  "description": "Example WBS for a care workflow scheduling and reassignment system.",
+  "rootId": "node-care-system",
+  "nodes": [
+    {
+      "id": "node-care-system",
+      "parentId": null,
+      "code": "1",
+      "name": "Care Workflow Support System",
+      "type": "deliverable",
+      "status": "planned"
+    },
+    {
+      "id": "node-workflow-analysis",
+      "parentId": "node-care-system",
+      "code": "1.1",
+      "name": "Workflow Analysis",
+      "type": "deliverable",
+      "status": "planned"
+    },
+    {
+      "id": "node-current-workflow-analysis",
+      "parentId": "node-workflow-analysis",
+      "code": "1.1.1",
+      "name": "Current Workflow Mapping",
+      "type": "workPackage",
+      "status": "planned",
+      "owner": "resource-business-analyst",
+      "assignees": ["resource-business-analyst"],
+      "progressPercent": 0,
+      "acceptanceCriteria": [
+        "Current staff assignment workflow is represented as BPMN",
+        "Exception cases are listed"
+      ],
+      "outputs": ["artifact-current-bpmn"]
+    },
+    {
+      "id": "node-reschedule-rules",
+      "parentId": "node-workflow-analysis",
+      "code": "1.1.2",
+      "name": "Rescheduling Rule Inventory",
+      "type": "workPackage",
+      "status": "planned",
+      "outputs": ["artifact-reschedule-rules"]
+    },
+    {
+      "id": "node-system-design",
+      "parentId": "node-care-system",
+      "code": "1.2",
+      "name": "System Design",
+      "type": "deliverable",
+      "status": "planned"
+    },
+    {
+      "id": "node-data-model",
+      "parentId": "node-system-design",
+      "code": "1.2.1",
+      "name": "Data Model Design",
+      "type": "workPackage",
+      "status": "planned",
+      "owner": "resource-backend-team",
+      "assignees": ["resource-backend-team"],
+      "progressPercent": 0
+    },
+    {
+      "id": "node-api-design",
+      "parentId": "node-system-design",
+      "code": "1.2.2",
+      "name": "API Design",
+      "type": "workPackage",
+      "status": "planned",
+      "owner": "resource-backend-team",
+      "assignees": ["resource-backend-team"],
+      "progressPercent": 0,
+      "tags": ["backend", "api"]
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel-data-model-after-workflow",
+      "type": "dependsOn",
+      "source": "node-data-model",
+      "target": "node-current-workflow-analysis"
+    },
+    {
+      "id": "rel-api-after-data-model",
+      "type": "dependsOn",
+      "source": "node-api-design",
+      "target": "node-data-model"
+    },
+    {
+      "id": "rel-workflow-refines-bpmn",
+      "type": "refinesBpmnTask",
+      "source": "node-current-workflow-analysis",
+      "target": "bpmn:Task_CurrentWorkflow"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-business-analyst",
+      "name": "Business Analyst",
+      "type": "role"
+    },
+    {
+      "id": "resource-backend-team",
+      "name": "Backend Team",
+      "type": "team"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-current-bpmn",
+      "name": "Current workflow BPMN",
+      "type": "design",
+      "uri": "./bpmn/current-workflow.bpmn"
+    },
+    {
+      "id": "artifact-reschedule-rules",
+      "name": "Rescheduling rules",
+      "type": "document",
+      "uri": "./docs/reschedule-rules.md"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2026-06-24T00:00:00+09:00",
+    "createdBy": "project-team",
+    "language": "en-US"
+  },
+  "extensions": {}
+}

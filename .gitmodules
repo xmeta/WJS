@@ -1,0 +1,3 @@
+[submodule "tools/single-file-wbs"]
+	path = tools/single-file-wbs
+	url = https://github.com/piguo45/single-file-wbs/

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "0.1.0",
+  "targetWbsId": "wbs-software-project",
+  "dryRun": true,
+  "operations": [
+    {
+      "operation": "updateNode",
+      "nodeId": "node-api-design",
+      "changes": {
+        "progressPercent": -1
+      }
+    }
+  ]
+}

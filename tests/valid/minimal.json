@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "wbs-valid-minimal",
+  "name": "Valid Minimal WBS",
+  "rootId": "node-root",
+  "nodes": [
+    {
+      "id": "node-root",
+      "parentId": null,
+      "code": "1",
+      "name": "Project",
+      "type": "deliverable",
+      "status": "planned",
+      "progressPercent": 0
+    }
+  ],
+  "relations": [],
+  "resources": [],
+  "artifacts": [],
+  "metadata": {},
+  "extensions": {}
+}

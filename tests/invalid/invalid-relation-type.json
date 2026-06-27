@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "wbs-invalid-relation-type",
+  "name": "Invalid Relation Type",
+  "rootId": "node-root",
+  "nodes": [
+    {
+      "id": "node-root",
+      "parentId": null,
+      "code": "1",
+      "name": "Project",
+      "type": "deliverable"
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel-001",
+      "type": "runsBefore",
+      "source": "node-root",
+      "target": "node-other"
+    }
+  ]
+}

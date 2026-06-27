@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "0.1.0",
+  "targetWbsId": "wbs-software-project",
+  "baseRevision": "rev-001",
+  "changeSetId": "changeset-001",
+  "author": "ai-agent",
+  "createdAt": "2026-06-24T00:00:00+09:00",
+  "reason": "Add API design tag and acceptance criterion",
+  "dryRun": true,
+  "operations": [
+    {
+      "operationId": "op-001",
+      "operation": "addTag",
+      "nodeId": "node-api-design",
+      "tag": "review"
+    },
+    {
+      "operationId": "op-002",
+      "operation": "addAcceptanceCriterion",
+      "nodeId": "node-api-design",
+      "criterion": "API design has been reviewed by backend team."
+    },
+    {
+      "operationId": "op-003",
+      "operation": "deleteNode",
+      "nodeId": "node-obsolete-review",
+      "deleteMode": "subtree",
+      "relationHandling": "failIfReferenced"
+    },
+    {
+      "operationId": "op-004",
+      "operation": "addNodeOutput",
+      "nodeId": "node-api-design",
+      "artifactId": "artifact-openapi-yaml"
+    },
+    {
+      "operationId": "op-005",
+      "operation": "deleteNodeOutput",
+      "nodeId": "node-api-design",
+      "artifactId": "artifact-old-api-doc"
+    },
+    {
+      "operationId": "op-006",
+      "operation": "updateNode",
+      "nodeId": "node-api-design",
+      "changes": {
+        "assignees": ["resource-backend-team"],
+        "progressPercent": 50
+      }
+    }
+  ]
+}

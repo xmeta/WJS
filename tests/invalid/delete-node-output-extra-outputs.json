@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "0.1.0",
+  "targetWbsId": "wbs-software-project",
+  "dryRun": true,
+  "operations": [
+    {
+      "operation": "deleteNodeOutput",
+      "nodeId": "node-api-design",
+      "artifactId": "artifact-openapi-yaml",
+      "outputs": []
+    }
+  ]
+}

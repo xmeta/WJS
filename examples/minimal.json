@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "wbs-example",
+  "name": "Example WBS",
+  "rootId": "node-root",
+  "nodes": [
+    {
+      "id": "node-root",
+      "parentId": null,
+      "code": "1",
+      "name": "Example Project",
+      "type": "deliverable",
+      "status": "planned"
+    },
+    {
+      "id": "node-requirements",
+      "parentId": "node-root",
+      "code": "1.1",
+      "name": "Requirements Definition",
+      "type": "workPackage",
+      "status": "planned"
+    }
+  ],
+  "relations": [],
+  "resources": [],
+  "artifacts": [],
+  "metadata": {
+    "language": "en-US"
+  },
+  "extensions": {}
+}

@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "wbs-test",
+  "name": "Test WBS",
+  "rootId": "node-root",
+  "nodes": [
+    {
+      "id": "node-root",
+      "parentId": null,
+      "code": "1",
+      "name": "Root",
+      "type": "deliverable",
+      "status": "planned"
+    },
+    {
+      "id": "node-child-a",
+      "parentId": "node-root",
+      "code": "1.1",
+      "name": "Child A",
+      "type": "workPackage",
+      "status": "planned",
+      "tags": ["alpha"],
+      "acceptanceCriteria": ["Criterion A"],
+      "outputs": ["artifact-a"]
+    },
+    {
+      "id": "node-child-b",
+      "parentId": "node-root",
+      "code": "1.2",
+      "name": "Child B",
+      "type": "workPackage",
+      "status": "planned",
+      "owner": "resource-dev",
+      "assignees": ["resource-dev"]
+    },
+    {
+      "id": "node-grandchild",
+      "parentId": "node-child-a",
+      "code": "1.1.1",
+      "name": "Grandchild",
+      "type": "activity",
+      "status": "planned"
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel-a-b",
+      "type": "dependsOn",
+      "source": "node-child-b",
+      "target": "node-child-a"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-dev",
+      "name": "Developer",
+      "type": "person"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-a",
+      "name": "Artifact A",
+      "type": "document"
+    }
+  ],
+  "metadata": {},
+  "extensions": {}
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "0.1.0",
+  "targetWbsId": "wbs-software-project",
+  "dryRun": true,
+  "operations": [
+    {
+      "operation": "moveNode",
+      "nodeId": "node-api-design",
+      "newParentId": "node-system-design",
+      "position": {
+        "mode": "first",
+        "referenceNodeId": "node-data-model"
+      }
+    }
+  ]
+}

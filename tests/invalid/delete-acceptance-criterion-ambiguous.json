@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "0.1.0",
+  "targetWbsId": "wbs-software-project",
+  "dryRun": true,
+  "operations": [
+    {
+      "operation": "deleteAcceptanceCriterion",
+      "nodeId": "node-api-design",
+      "criterion": "Old criterion",
+      "index": 0
+    }
+  ]
+}

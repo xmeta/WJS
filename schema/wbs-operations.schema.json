@@ -1,0 +1,1561 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/wbs-json/0.1.0/wbs-operations.schema.json",
+  "title": "WBS-JSON Operations",
+  "description": "Atomic semantic operations for editing WBS-JSON documents.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "targetWbsId",
+    "operations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Version of this WBS operation schema."
+    },
+    "targetWbsId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "ID of the WBS document to which these operations apply."
+    },
+    "baseRevision": {
+      "type": "string",
+      "description": "Optional revision, commit hash, or version of the WBS document before applying operations."
+    },
+    "changeSetId": {
+      "type": "string",
+      "description": "Unique ID for this operation batch."
+    },
+    "author": {
+      "type": "string",
+      "description": "Human or AI agent that created this operation batch."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Human-readable reason for this operation batch."
+    },
+    "dryRun": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, operations are proposed but should not be applied automatically."
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/Operation"
+      }
+    }
+  },
+  "$defs": {
+    "Operation": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/AddNodeOperation"
+        },
+        {
+          "$ref": "#/$defs/UpdateNodeOperation"
+        },
+        {
+          "$ref": "#/$defs/RenameNodeOperation"
+        },
+        {
+          "$ref": "#/$defs/MoveNodeOperation"
+        },
+        {
+          "$ref": "#/$defs/DeleteNodeOperation"
+        },
+        {
+          "$ref": "#/$defs/ChangeNodeStatusOperation"
+        },
+        {
+          "$ref": "#/$defs/ReorderChildrenOperation"
+        },
+        {
+          "$ref": "#/$defs/AddRelationOperation"
+        },
+        {
+          "$ref": "#/$defs/UpdateRelationOperation"
+        },
+        {
+          "$ref": "#/$defs/DeleteRelationOperation"
+        },
+        {
+          "$ref": "#/$defs/AddArtifactOperation"
+        },
+        {
+          "$ref": "#/$defs/UpdateArtifactOperation"
+        },
+        {
+          "$ref": "#/$defs/DeleteArtifactOperation"
+        },
+        {
+          "$ref": "#/$defs/AddResourceOperation"
+        },
+        {
+          "$ref": "#/$defs/UpdateResourceOperation"
+        },
+        {
+          "$ref": "#/$defs/DeleteResourceOperation"
+        },
+        {
+          "$ref": "#/$defs/SetNodeOutputsOperation"
+        },
+        {
+          "$ref": "#/$defs/AddNodeOutputOperation"
+        },
+        {
+          "$ref": "#/$defs/DeleteNodeOutputOperation"
+        },
+        {
+          "$ref": "#/$defs/AddAcceptanceCriterionOperation"
+        },
+        {
+          "$ref": "#/$defs/DeleteAcceptanceCriterionOperation"
+        },
+        {
+          "$ref": "#/$defs/AddTagOperation"
+        },
+        {
+          "$ref": "#/$defs/DeleteTagOperation"
+        }
+      ]
+    },
+    "NodeId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "RelationId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ArtifactId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ResourceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "WbsCode": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*$"
+    },
+    "Tag": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^\\S+$"
+    },
+    "SiblingPosition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "first",
+            "last",
+            "before",
+            "after"
+          ],
+          "default": "last"
+        },
+        "referenceNodeId": {
+          "$ref": "#/$defs/NodeId"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "mode"
+            ],
+            "properties": {
+              "mode": {
+                "enum": [
+                  "before",
+                  "after"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "referenceNodeId"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "mode"
+            ],
+            "properties": {
+              "mode": {
+                "enum": [
+                  "first",
+                  "last"
+                ]
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "referenceNodeId"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "NodeType": {
+      "type": "string",
+      "enum": [
+        "summary",
+        "deliverable",
+        "workPackage",
+        "activity",
+        "milestone"
+      ]
+    },
+    "NodeStatus": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "planned",
+        "ready",
+        "inProgress",
+        "blocked",
+        "completed",
+        "cancelled"
+      ]
+    },
+    "Effort": {
+      "type": "object",
+      "required": [
+        "value",
+        "unit"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "enum": [
+            "hour",
+            "personHour",
+            "day",
+            "personDay",
+            "week",
+            "personWeek",
+            "month",
+            "personMonth",
+            "point"
+          ]
+        }
+      }
+    },
+    "WbsNodeInput": {
+      "type": "object",
+      "required": [
+        "id",
+        "parentId",
+        "code",
+        "name",
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "parentId": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NodeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "code": {
+          "$ref": "#/$defs/WbsCode"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/NodeType"
+        },
+        "description": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/NodeStatus"
+        },
+        "owner": {
+          "$ref": "#/$defs/ResourceId",
+          "description": "Resource ID responsible for this node."
+        },
+        "assignees": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ResourceId"
+          },
+          "uniqueItems": true,
+          "default": [],
+          "description": "Resource IDs assigned to work on this node."
+        },
+        "estimate": {
+          "$ref": "#/$defs/Effort"
+        },
+        "actual": {
+          "$ref": "#/$defs/Effort"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "progressPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Optional completion percentage from 0 to 100."
+        },
+        "acceptanceCriteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ArtifactId"
+          },
+          "default": []
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Tag"
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "NodePatch": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/WbsCode"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/NodeType"
+        },
+        "description": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/NodeStatus"
+        },
+        "owner": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ResourceId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assignees": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ResourceId"
+          },
+          "uniqueItems": true
+        },
+        "estimate": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Effort"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "actual": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Effort"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "startDate": {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "endDate": {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "progressPercent": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Optional completion percentage from 0 to 100."
+        },
+        "acceptanceCriteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ArtifactId"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Tag"
+          },
+          "uniqueItems": true
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "RelationInput": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "source",
+        "target"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/RelationId"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "dependsOn",
+            "blocks",
+            "produces",
+            "consumes",
+            "implementsRequirement",
+            "refinesBpmnTask",
+            "linkedToIssue",
+            "relatedTo"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "RelationPatch": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "dependsOn",
+            "blocks",
+            "produces",
+            "consumes",
+            "implementsRequirement",
+            "refinesBpmnTask",
+            "linkedToIssue",
+            "relatedTo"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "ArtifactInput": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/ArtifactId"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "document",
+            "sourceCode",
+            "design",
+            "testCase",
+            "configuration",
+            "dataset",
+            "service",
+            "other"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "description": {
+          "type": "string"
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "ArtifactPatch": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "document",
+            "sourceCode",
+            "design",
+            "testCase",
+            "configuration",
+            "dataset",
+            "service",
+            "other"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri-reference"
+        },
+        "description": {
+          "type": "string"
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "ResourceInput": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "person",
+            "team",
+            "role",
+            "organization"
+          ]
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "ResourcePatch": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "person",
+            "team",
+            "role",
+            "organization"
+          ]
+        },
+        "email": {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "email"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "OperationCommon": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "description": "Unique ID for this operation within the change set."
+        },
+        "comment": {
+          "type": "string",
+          "description": "Human-readable explanation for this operation."
+        }
+      }
+    },
+    "AddNodeOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "node"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "addNode"
+            },
+            "node": {
+              "$ref": "#/$defs/WbsNodeInput"
+            },
+            "position": {
+              "$ref": "#/$defs/SiblingPosition"
+            }
+          }
+        }
+      ]
+    },
+    "UpdateNodeOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "nodeId",
+            "changes"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "updateNode"
+            },
+            "nodeId": {
+              "$ref": "#/$defs/NodeId"
+            },
+            "changes": {
+              "$ref": "#/$defs/NodePatch"
+            }
+          }
+        }
+      ]
+    },
+    "RenameNodeOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "nodeId",
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "renameNode"
+            },
+            "nodeId": {
+              "$ref": "#/$defs/NodeId"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "MoveNodeOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "nodeId",
+            "newParentId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "moveNode"
+            },
+            "nodeId": {
+              "$ref": "#/$defs/NodeId"
+            },
+            "newParentId": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/NodeId"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "newCode": {
+              "$ref": "#/$defs/WbsCode"
+            },
+            "position": {
+              "$ref": "#/$defs/SiblingPosition"
+            },
+            "renumberDescendants": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        }
+      ]
+    },
+    "DeleteNodeOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "nodeId",
+            "deleteMode"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "deleteNode"
+            },
+            "nodeId": {
+              "$ref": "#/$defs/NodeId"
+            },
+            "deleteMode": {
+              "type": "string",
+              "enum": [
+                "nodeOnly",
+                "subtree"
+              ],
+              "description": "nodeOnly deletes the node and reattaches its children to the parent. subtree deletes the node and all descendants."
+            },
+            "relationHandling": {
+              "type": "string",
+              "enum": [
+                "failIfReferenced",
+                "deleteReferencingRelations"
+              ],
+              "default": "failIfReferenced",
+              "description": "How to handle relations whose source or target is a deleted node."
+            }
+          }
+        }
+      ]
+    },
+    "ChangeNodeStatusOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "nodeId",
+            "status"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "changeNodeStatus"
+            },
+            "nodeId": {
+              "$ref": "#/$defs/NodeId"
+            },
+            "status": {
+              "$ref": "#/$defs/NodeStatus"
+            }
+          }
+        }
+      ]
+    },
+    "ReorderChildrenOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "parentId",
+            "orderedChildIds"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "reorderChildren"
+            },
+            "parentId": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/NodeId"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "orderedChildIds": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/NodeId"
+              },
+              "uniqueItems": true
+            },
+            "renumberChildren": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      ]
+    },
+    "AddRelationOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "relation"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "addRelation"
+            },
+            "relation": {
+              "$ref": "#/$defs/RelationInput"
+            }
+          }
+        }
+      ]
+    },
+    "DeleteRelationOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "relationId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "deleteRelation"
+            },
+            "relationId": {
+              "$ref": "#/$defs/RelationId"
+            }
+          }
+        }
+      ]
+    },
+    "UpdateRelationOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "relationId",
+            "changes"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "updateRelation"
+            },
+            "relationId": {
+              "$ref": "#/$defs/RelationId"
+            },
+            "changes": {
+              "$ref": "#/$defs/RelationPatch"
+            }
+          }
+        }
+      ]
+    },
+    "AddArtifactOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "artifact"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "addArtifact"
+            },
+            "artifact": {
+              "$ref": "#/$defs/ArtifactInput"
+            }
+          }
+        }
+      ]
+    },
+    "UpdateArtifactOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "artifactId",
+            "changes"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "updateArtifact"
+            },
+            "artifactId": {
+              "$ref": "#/$defs/ArtifactId"
+            },
+            "changes": {
+              "$ref": "#/$defs/ArtifactPatch"
+            }
+          }
+        }
+      ]
+    },
+    "DeleteArtifactOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "artifactId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "deleteArtifact"
+            },
+            "artifactId": {
+              "$ref": "#/$defs/ArtifactId"
+            },
+            "detachFromNodes": {
+              "type": "boolean",
+              "default": true,
+              "description": "If true, remove this artifact ID from node outputs."
+            }
+          }
+        }
+      ]
+    },
+    "AddResourceOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "resource"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "addResource"
+            },
+            "resource": {
+              "$ref": "#/$defs/ResourceInput"
+            }
+          }
+        }
+      ]
+    },
+    "UpdateResourceOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "resourceId",
+            "changes"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "updateResource"
+            },
+            "resourceId": {
+              "$ref": "#/$defs/ResourceId"
+            },
+            "changes": {
+              "$ref": "#/$defs/ResourcePatch"
+            }
+          }
+        }
+      ]
+    },
+    "DeleteResourceOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "resourceId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "deleteResource"
+            },
+            "resourceId": {
+              "$ref": "#/$defs/ResourceId"
+            },
+            "detachFromNodes": {
+              "type": "boolean",
+              "default": true,
+              "description": "If true, remove this resource ID from node owner fields and assignees arrays."
+            }
+          }
+        }
+      ]
+    },
+    "SetNodeOutputsOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "nodeId",
+            "outputs"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "setNodeOutputs"
+            },
+            "nodeId": {
+              "$ref": "#/$defs/NodeId"
+            },
+            "outputs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ArtifactId"
+              },
+              "uniqueItems": true
+            }
+          }
+        }
+      ]
+    },
+    "AddNodeOutputOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "nodeId",
+            "artifactId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "addNodeOutput"
+            },
+            "nodeId": {
+              "$ref": "#/$defs/NodeId"
+            },
+            "artifactId": {
+              "$ref": "#/$defs/ArtifactId"
+            }
+          }
+        }
+      ]
+    },
+    "DeleteNodeOutputOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "nodeId",
+            "artifactId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "deleteNodeOutput"
+            },
+            "nodeId": {
+              "$ref": "#/$defs/NodeId"
+            },
+            "artifactId": {
+              "$ref": "#/$defs/ArtifactId"
+            }
+          }
+        }
+      ]
+    },
+    "AddAcceptanceCriterionOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "nodeId",
+            "criterion"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "addAcceptanceCriterion"
+            },
+            "nodeId": {
+              "$ref": "#/$defs/NodeId"
+            },
+            "criterion": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "DeleteAcceptanceCriterionOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "nodeId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "deleteAcceptanceCriterion"
+            },
+            "nodeId": {
+              "$ref": "#/$defs/NodeId"
+            },
+            "criterion": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Criterion text to remove."
+            },
+            "index": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Index of criterion to remove."
+            },
+            "matchMode": {
+              "type": "string",
+              "enum": [
+                "exact",
+                "normalized"
+              ],
+              "default": "exact"
+            }
+          },
+          "oneOf": [
+            {
+              "required": [
+                "criterion"
+              ],
+              "not": {
+                "required": [
+                  "index"
+                ]
+              }
+            },
+            {
+              "required": [
+                "index"
+              ],
+              "not": {
+                "required": [
+                  "criterion"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "AddTagOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "nodeId",
+            "tag"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "addTag"
+            },
+            "nodeId": {
+              "$ref": "#/$defs/NodeId"
+            },
+            "tag": {
+              "$ref": "#/$defs/Tag"
+            }
+          }
+        }
+      ]
+    },
+    "DeleteTagOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "nodeId",
+            "tag"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "deleteTag"
+            },
+            "nodeId": {
+              "$ref": "#/$defs/NodeId"
+            },
+            "tag": {
+              "$ref": "#/$defs/Tag"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

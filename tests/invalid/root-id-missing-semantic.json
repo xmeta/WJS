@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "wbs-invalid-root-reference",
+  "name": "Root Reference Semantic Error",
+  "rootId": "node-missing",
+  "nodes": [
+    {
+      "id": "node-root",
+      "parentId": null,
+      "code": "1",
+      "name": "Project",
+      "type": "deliverable"
+    }
+  ],
+  "relations": [],
+  "resources": [],
+  "artifacts": []
+}

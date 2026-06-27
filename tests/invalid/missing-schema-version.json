@@ -1,0 +1,14 @@
+{
+  "id": "wbs-invalid-missing-schema-version",
+  "name": "Invalid WBS",
+  "rootId": "node-root",
+  "nodes": [
+    {
+      "id": "node-root",
+      "parentId": null,
+      "code": "1",
+      "name": "Project",
+      "type": "deliverable"
+    }
+  ]
+}

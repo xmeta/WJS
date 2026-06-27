@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "0.1.0",
+  "targetWbsId": "wbs-software-project",
+  "dryRun": true,
+  "operations": [
+    {
+      "operation": "addNodeOutput",
+      "nodeId": "node-api-design"
+    }
+  ]
+}

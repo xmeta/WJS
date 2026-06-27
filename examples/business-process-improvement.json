@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "wbs-business-process-improvement",
+  "name": "Invoice Process Improvement WBS",
+  "rootId": "node-process-improvement",
+  "nodes": [
+    {
+      "id": "node-process-improvement",
+      "parentId": null,
+      "code": "1",
+      "name": "Invoice Process Improvement",
+      "type": "deliverable",
+      "status": "planned"
+    },
+    {
+      "id": "node-current-state",
+      "parentId": "node-process-improvement",
+      "code": "1.1",
+      "name": "Current State Analysis",
+      "type": "workPackage",
+      "status": "planned",
+      "owner": "resource-process-analyst",
+      "outputs": ["artifact-current-bpmn"]
+    },
+    {
+      "id": "node-pain-points",
+      "parentId": "node-current-state",
+      "code": "1.1.1",
+      "name": "Pain Point Inventory",
+      "type": "activity",
+      "status": "planned",
+      "outputs": ["artifact-pain-points"]
+    },
+    {
+      "id": "node-future-state",
+      "parentId": "node-process-improvement",
+      "code": "1.2",
+      "name": "Future State Design",
+      "type": "deliverable",
+      "status": "planned",
+      "outputs": ["artifact-future-bpmn"]
+    },
+    {
+      "id": "node-approval",
+      "parentId": "node-process-improvement",
+      "code": "1.3",
+      "name": "Improvement Plan Approval",
+      "type": "milestone",
+      "status": "planned"
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel-future-after-current",
+      "type": "dependsOn",
+      "source": "node-future-state",
+      "target": "node-current-state"
+    },
+    {
+      "id": "rel-current-refines-bpmn",
+      "type": "refinesBpmnTask",
+      "source": "node-current-state",
+      "target": "bpmn:Task_MapCurrentInvoiceProcess"
+    },
+    {
+      "id": "rel-approval-after-future",
+      "type": "dependsOn",
+      "source": "node-approval",
+      "target": "node-future-state"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-process-analyst",
+      "name": "Process Analyst",
+      "type": "role"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-current-bpmn",
+      "name": "Current invoice process BPMN",
+      "type": "design",
+      "uri": "./bpmn/current-invoice-process.bpmn"
+    },
+    {
+      "id": "artifact-pain-points",
+      "name": "Pain point inventory",
+      "type": "document",
+      "uri": "./docs/pain-points.md"
+    },
+    {
+      "id": "artifact-future-bpmn",
+      "name": "Future invoice process BPMN",
+      "type": "design",
+      "uri": "./bpmn/future-invoice-process.bpmn"
+    }
+  ],
+  "metadata": {
+    "language": "en-US"
+  },
+  "extensions": {}
+}

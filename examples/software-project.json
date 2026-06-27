@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "wbs-software-project",
+  "name": "Customer Portal Development WBS",
+  "description": "Example WBS for a vendor-neutral software project.",
+  "rootId": "node-project",
+  "nodes": [
+    {
+      "id": "node-project",
+      "parentId": null,
+      "code": "1",
+      "name": "Customer Portal",
+      "type": "deliverable",
+      "status": "planned"
+    },
+    {
+      "id": "node-requirements",
+      "parentId": "node-project",
+      "code": "1.1",
+      "name": "Requirements Definition",
+      "type": "workPackage",
+      "status": "completed",
+      "owner": "resource-business-analyst",
+      "assignees": ["resource-business-analyst"],
+      "progressPercent": 100,
+      "outputs": ["artifact-requirements"],
+      "acceptanceCriteria": ["Priority user stories are approved"],
+      "tags": ["requirements"]
+    },
+    {
+      "id": "node-system-design",
+      "parentId": "node-project",
+      "code": "1.2",
+      "name": "System Design",
+      "type": "deliverable",
+      "status": "planned"
+    },
+    {
+      "id": "node-data-model",
+      "parentId": "node-system-design",
+      "code": "1.2.1",
+      "name": "Data Model Design",
+      "type": "workPackage",
+      "status": "planned",
+      "owner": "resource-backend-team",
+      "assignees": ["resource-backend-team"],
+      "progressPercent": 0,
+      "outputs": ["artifact-data-model"],
+      "tags": ["backend"]
+    },
+    {
+      "id": "node-api-design",
+      "parentId": "node-system-design",
+      "code": "1.2.2",
+      "name": "API Design",
+      "type": "workPackage",
+      "status": "planned",
+      "owner": "resource-backend-team",
+      "assignees": ["resource-backend-team"],
+      "progressPercent": 0,
+      "outputs": ["artifact-openapi-yaml"],
+      "acceptanceCriteria": ["OpenAPI paths and schemas are reviewed"],
+      "tags": ["backend", "api"]
+    },
+    {
+      "id": "node-implementation",
+      "parentId": "node-project",
+      "code": "1.3",
+      "name": "Implementation",
+      "type": "summary",
+      "status": "planned"
+    },
+    {
+      "id": "node-backend-implementation",
+      "parentId": "node-implementation",
+      "code": "1.3.1",
+      "name": "Backend Implementation",
+      "type": "activity",
+      "status": "planned",
+      "owner": "resource-backend-team"
+    },
+    {
+      "id": "node-release-milestone",
+      "parentId": "node-project",
+      "code": "1.4",
+      "name": "Production Release",
+      "type": "milestone",
+      "status": "planned"
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel-design-after-requirements",
+      "type": "dependsOn",
+      "source": "node-system-design",
+      "target": "node-requirements"
+    },
+    {
+      "id": "rel-api-after-data-model",
+      "type": "dependsOn",
+      "source": "node-api-design",
+      "target": "node-data-model"
+    },
+    {
+      "id": "rel-backend-after-api",
+      "type": "dependsOn",
+      "source": "node-backend-implementation",
+      "target": "node-api-design"
+    },
+    {
+      "id": "rel-api-implements-requirement",
+      "type": "implementsRequirement",
+      "source": "node-api-design",
+      "target": "req:REQ-API-001"
+    },
+    {
+      "id": "rel-api-linked-issue",
+      "type": "linkedToIssue",
+      "source": "node-api-design",
+      "target": "github:example/repo#123"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-business-analyst",
+      "name": "Business Analyst",
+      "type": "role"
+    },
+    {
+      "id": "resource-backend-team",
+      "name": "Backend Team",
+      "type": "team"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-requirements",
+      "name": "Requirements specification",
+      "type": "document",
+      "uri": "./docs/requirements.md"
+    },
+    {
+      "id": "artifact-data-model",
+      "name": "Data model diagram",
+      "type": "design",
+      "uri": "./docs/data-model.md"
+    },
+    {
+      "id": "artifact-openapi-yaml",
+      "name": "OpenAPI specification",
+      "type": "document",
+      "uri": "./docs/openapi.yaml"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2026-06-24T00:00:00+09:00",
+    "createdBy": "project-team",
+    "language": "en-US"
+  },
+  "extensions": {}
+}
