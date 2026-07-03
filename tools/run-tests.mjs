@@ -3,6 +3,34 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { buildSync } from "esbuild";
 
+function runWithBun() {
+  if (process.env.WBS_JSON_USE_BUN === "0") return undefined;
+  const platform = spawnSync("bun", ["-e", "console.log(process.platform)"], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+  if (platform.error?.code === "ENOENT") return undefined;
+  if (platform.error) throw platform.error;
+  if (platform.status !== 0 || platform.stdout.trim() !== process.platform) return undefined;
+
+  const testsDir = path.join("tests", "apply");
+  const testFiles = readdirSync(testsDir)
+    .filter((file) => file.endsWith(".test.ts"))
+    .map((file) => `./tests/apply/${file}`);
+  const result = spawnSync("bun", ["test", ...testFiles], {
+    cwd: process.cwd(),
+    stdio: "inherit"
+  });
+  if (result.error?.code === "ENOENT") return undefined;
+  if (result.error) throw result.error;
+  return result.status ?? 1;
+}
+
+const bunStatus = runWithBun();
+if (bunStatus !== undefined) {
+  process.exit(bunStatus);
+}
+
 const tempRoot = path.join(process.cwd(), ".tmp");
 mkdirSync(tempRoot, { recursive: true });
 const tempDir = mkdtempSync(path.join(tempRoot, "wbs-json-tests-"));
