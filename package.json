@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "validate": "node --experimental-strip-types tools/validate.ts",
-    "validate:all": "node --experimental-strip-types tools/validate-all.ts",
-    "normalize": "node --experimental-strip-types tools/normalize.ts",
-    "apply": "node --experimental-strip-types tools/apply.ts",
-    "test": "node --experimental-strip-types --test tests/apply/*.test.ts"
+    "validate": "node tools/run-ts.mjs tools/validate.ts",
+    "validate:all": "node tools/run-ts.mjs tools/validate-all.ts",
+    "normalize": "node tools/run-ts.mjs tools/normalize.ts",
+    "apply": "node tools/run-ts.mjs tools/apply.ts",
+    "test": "node tools/run-tests.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0"
