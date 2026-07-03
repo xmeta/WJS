@@ -1,5 +1,4 @@
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { describe, it } from "node:test";
@@ -7,7 +6,9 @@ import assert from "node:assert/strict";
 
 describe("apply CLI runner", () => {
   it("runs apply.ts without requiring Node TypeScript strip support", () => {
-    const tempDir = mkdtempSync(path.join(tmpdir(), "wbs-json-apply-cli-"));
+    const tempRoot = path.join(process.cwd(), ".tmp");
+    mkdirSync(tempRoot, { recursive: true });
+    const tempDir = mkdtempSync(path.join(tempRoot, "wbs-json-apply-cli-"));
     const wbsPath = path.join(tempDir, "wbs.json");
     const changeSetPath = path.join(tempDir, "change-set.json");
     const outputPath = path.join(tempDir, "out.json");
@@ -41,7 +42,7 @@ describe("apply CLI runner", () => {
       ]
     })}\n`);
 
-    const result = spawnSync(process.execPath, [
+    const result = spawnSync("node", [
       "tools/run-ts.mjs",
       "tools/apply.ts",
       wbsPath,

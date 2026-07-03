@@ -10,6 +10,22 @@ if (!entryPoint) {
   process.exit(2);
 }
 
+function runWithBun() {
+  if (process.env.WBS_JSON_USE_BUN === "0") return undefined;
+  const result = spawnSync("bun", [entryPoint, ...entryArgs], {
+    cwd: process.cwd(),
+    stdio: "inherit"
+  });
+  if (result.error?.code === "ENOENT") return undefined;
+  if (result.error) throw result.error;
+  return result.status ?? 1;
+}
+
+const bunStatus = runWithBun();
+if (bunStatus !== undefined) {
+  process.exit(bunStatus);
+}
+
 const tempRoot = path.join(process.cwd(), ".tmp");
 mkdirSync(tempRoot, { recursive: true });
 const tempDir = mkdtempSync(path.join(tempRoot, "wbs-json-run-ts-"));
