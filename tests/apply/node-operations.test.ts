@@ -145,6 +145,162 @@ describe("node operations", () => {
     const siblings = result.document.nodes.filter((n) => n.parentId === "node-root");
     assert.deepEqual(siblings.map((n) => n.id), ["node-child-b", "node-child-a"]);
   });
+
+  it("inserts at first sibling position", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "addNode",
+      node: {
+        id: "node-new-first",
+        parentId: "node-root",
+        code: "1.0",
+        name: "First Child",
+        type: "workPackage"
+      },
+      position: { mode: "first" }
+    }]);
+
+    assert.equal(result.success, true);
+    const siblings = result.document.nodes.filter((n) => n.parentId === "node-root");
+    assert.equal(siblings[0].id, "node-new-first");
+  });
+
+  it("inserts before a reference sibling", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "addNode",
+      node: {
+        id: "node-new-before",
+        parentId: "node-root",
+        code: "1.15",
+        name: "Before B",
+        type: "workPackage"
+      },
+      position: { mode: "before", referenceNodeId: "node-child-b" }
+    }]);
+
+    assert.equal(result.success, true);
+    const siblings = result.document.nodes.filter((n) => n.parentId === "node-root");
+    const indexB = siblings.findIndex((n) => n.id === "node-child-b");
+    assert.equal(siblings[indexB - 1].id, "node-new-before");
+  });
+
+  it("rejects duplicate node id", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "addNode",
+      node: {
+        id: "node-child-a",
+        parentId: "node-root",
+        code: "1.9",
+        name: "Duplicate",
+        type: "workPackage"
+      }
+    }]);
+
+    assert.equal(result.success, false);
+    assert.match(result.errors[0].message, /already exists/);
+  });
+
+  it("rejects missing parent", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "addNode",
+      node: {
+        id: "node-orphan",
+        parentId: "node-missing",
+        code: "9",
+        name: "Orphan",
+        type: "workPackage"
+      }
+    }]);
+
+    assert.equal(result.success, false);
+    assert.match(result.errors[0].message, /does not exist/);
+  });
+
+  it("rejects second root node", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "addNode",
+      node: {
+        id: "node-second-root",
+        parentId: null,
+        code: "2",
+        name: "Second Root",
+        type: "deliverable"
+      }
+    }]);
+
+    assert.equal(result.success, false);
+    assert.match(result.errors[0].message, /second root/);
+  });
+
+  it("rejects parentId changes via updateNode at schema validation", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "updateNode",
+      nodeId: "node-child-a",
+      changes: { parentId: "node-child-b" }
+    }]);
+
+    assert.equal(result.success, false);
+    assert.equal(result.errors[0].operation, "changeSet");
+    assert.match(result.errors[0].message, /parentId/);
+  });
+
+  it("moveNode respects explicit newCode without sibling renumber", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "moveNode",
+      nodeId: "node-child-a",
+      newParentId: "node-child-b",
+      newCode: "9.9.9",
+      renumberDescendants: false
+    }]);
+
+    assert.equal(result.success, true);
+    const moved = result.document.nodes.find((n) => n.id === "node-child-a");
+    assert.equal(moved?.code, "9.9.9");
+    assert.equal(result.document.nodes.find((n) => n.id === "node-grandchild")?.code, "1.1.1");
+  });
+
+  it("renumbers children when renumberChildren is true", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "reorderChildren",
+      parentId: "node-root",
+      orderedChildIds: ["node-child-b", "node-child-a"],
+      renumberChildren: true
+    }]);
+
+    assert.equal(result.success, true);
+    assert.equal(result.document.nodes.find((n) => n.id === "node-child-b")?.code, "1.1");
+    assert.equal(result.document.nodes.find((n) => n.id === "node-child-a")?.code, "1.2");
+  });
+
+  it("rejects incomplete orderedChildIds", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "reorderChildren",
+      parentId: "node-root",
+      orderedChildIds: ["node-child-a"]
+    }]);
+
+    assert.equal(result.success, false);
+    assert.match(result.errors[0].message, /exactly the current children/);
+  });
+
+  it("rejects extra unknown child id", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "reorderChildren",
+      parentId: "node-root",
+      orderedChildIds: ["node-child-a", "node-child-b", "node-unknown"]
+    }]);
+
+    assert.equal(result.success, false);
+  });
 });
 
 describe("relation operations", () => {
@@ -185,5 +341,32 @@ describe("relation operations", () => {
 
     assert.equal(result.success, true);
     assert.equal(result.document.relations?.length, 0);
+  });
+
+  it("deleteRelation fails for missing relation", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "deleteRelation",
+      relationId: "rel-missing"
+    }]);
+
+    assert.equal(result.success, false);
+    assert.match(result.errors[0].message, /does not exist/);
+  });
+
+  it("addRelation rejects duplicate id", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "addRelation",
+      relation: {
+        id: "rel-a-b",
+        type: "relatedTo",
+        source: "node-child-a",
+        target: "node-child-b"
+      }
+    }]);
+
+    assert.equal(result.success, false);
+    assert.match(result.errors[0].message, /already exists/);
   });
 });

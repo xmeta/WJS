@@ -85,4 +85,39 @@ describe("artifact and resource operations", () => {
     assert.equal(node?.owner, undefined);
     assert.deepEqual(node?.assignees, []);
   });
+
+  it("deleteArtifact fails when referenced and detachFromNodes is false", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "deleteArtifact",
+      artifactId: "artifact-a",
+      detachFromNodes: false
+    }]);
+
+    assert.equal(result.success, false);
+    assert.match(result.errors[0].message, /detachFromNodes is false/);
+  });
+
+  it("deleteResource fails when referenced and detachFromNodes is false", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "deleteResource",
+      resourceId: "resource-dev",
+      detachFromNodes: false
+    }]);
+
+    assert.equal(result.success, false);
+    assert.match(result.errors[0].message, /detachFromNodes is false/);
+  });
+
+  it("addArtifact rejects duplicate id", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "addArtifact",
+      artifact: { id: "artifact-a", name: "Dup", type: "document" }
+    }]);
+
+    assert.equal(result.success, false);
+    assert.match(result.errors[0].message, /already exists/);
+  });
 });

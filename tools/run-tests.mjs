@@ -36,9 +36,19 @@ mkdirSync(tempRoot, { recursive: true });
 const tempDir = mkdtempSync(path.join(tempRoot, "wbs-json-tests-"));
 
 function toolEntryPoints() {
-  return readdirSync("tools")
-    .filter((file) => file.endsWith(".ts"))
-    .map((file) => path.join("tools", file));
+  const files = [];
+  function collect(dir) {
+    for (const entry of readdirSync(dir)) {
+      const full = path.join(dir, entry);
+      if (statSync(full).isDirectory()) {
+        collect(full);
+      } else if (entry.endsWith(".ts")) {
+        files.push(full);
+      }
+    }
+  }
+  collect("tools");
+  return files;
 }
 
 function rewriteTsImportSpecifiers(dir) {

@@ -125,4 +125,50 @@ describe("convenience operations", () => {
     assert.equal(del.success, true);
     assert.equal(del.document.nodes.find((n) => n.id === "node-child-a")?.tags?.includes("beta"), false);
   });
+
+  it("deleteAcceptanceCriterion rejects both criterion and index at schema validation", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "deleteAcceptanceCriterion",
+      nodeId: "node-child-a",
+      criterion: "Criterion A",
+      index: 0
+    }]);
+
+    assert.equal(result.success, false);
+    assert.equal(result.errors[0].operation, "changeSet");
+  });
+
+  it("deleteAcceptanceCriterion deletes by normalized matchMode", () => {
+    const base = loadBase();
+    const withSpaces = apply(base, [{
+      operation: "addAcceptanceCriterion",
+      nodeId: "node-child-a",
+      criterion: "  Spaced   criterion  "
+    }]);
+    assert.equal(withSpaces.success, true);
+
+    const result = apply(withSpaces.document, [{
+      operation: "deleteAcceptanceCriterion",
+      nodeId: "node-child-a",
+      criterion: "Spaced criterion",
+      matchMode: "normalized"
+    }]);
+
+    assert.equal(result.success, true);
+    const criteria = result.document.nodes.find((n) => n.id === "node-child-a")?.acceptanceCriteria ?? [];
+    assert.equal(criteria.some((c) => c.includes("Spaced")), false);
+  });
+
+  it("deleteTag is idempotent with warning", () => {
+    const base = loadBase();
+    const result = apply(base, [{
+      operation: "deleteTag",
+      nodeId: "node-child-a",
+      tag: "missing-tag"
+    }]);
+
+    assert.equal(result.success, true);
+    assert.ok(result.warnings.some((w) => w.includes("does not have tag")));
+  });
 });

@@ -146,4 +146,82 @@ describe("edge cases", () => {
     assert.equal(result.success, false);
     assert.match(result.errors[0].message, /root/);
   });
+
+  it("fails on invalid change set schema", () => {
+    const base = loadBase();
+    const result = applyOperations(base, {
+      schemaVersion: "0.1.0",
+      targetWbsId: "wbs-test",
+      operations: [{
+        operation: "renameNode",
+        nodeId: "node-child-a"
+      } as ChangeSet["operations"][number]]
+    }, { forceDryRun: true });
+
+    assert.equal(result.success, false);
+    assert.equal(result.errors[0].operation, "changeSet");
+  });
+
+  it("fails post-apply semantic validation for invalid output reference", () => {
+    const base = loadBase();
+    const result = applyOperations(base, {
+      schemaVersion: "0.1.0",
+      targetWbsId: "wbs-test",
+      operations: [{
+        operation: "setNodeOutputs",
+        nodeId: "node-child-a",
+        outputs: ["artifact-nonexistent"]
+      }]
+    }, { forceDryRun: true });
+
+    assert.equal(result.success, false);
+    assert.equal(result.errors[0].operation, "semanticValidation");
+    assert.match(result.errors[0].message, /output/);
+  });
+
+  it("forceDryRun sets applied true on success", () => {
+    const base = loadBase();
+    const result = applyOperations(base, {
+      schemaVersion: "0.1.0",
+      targetWbsId: "wbs-test",
+      dryRun: true,
+      operations: [{
+        operation: "renameNode",
+        nodeId: "node-child-a",
+        name: "Forced"
+      }]
+    }, { forceDryRun: true });
+
+    assert.equal(result.success, true);
+    assert.equal(result.applied, true);
+  });
+
+  it("applies multiple operations in sequence", () => {
+    const base = loadBase();
+    const result = applyOperations(base, {
+      schemaVersion: "0.1.0",
+      targetWbsId: "wbs-test",
+      operations: [
+        {
+          operation: "addArtifact",
+          artifact: { id: "artifact-new", name: "New", type: "document" }
+        },
+        {
+          operation: "addNodeOutput",
+          nodeId: "node-child-b",
+          artifactId: "artifact-new"
+        },
+        {
+          operation: "changeNodeStatus",
+          nodeId: "node-child-b",
+          status: "ready"
+        }
+      ]
+    }, { forceDryRun: true });
+
+    assert.equal(result.success, true);
+    const node = result.document.nodes.find((n) => n.id === "node-child-b");
+    assert.deepEqual(node?.outputs, ["artifact-new"]);
+    assert.equal(node?.status, "ready");
+  });
 });
