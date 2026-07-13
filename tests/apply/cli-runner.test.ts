@@ -52,7 +52,8 @@ describe("apply CLI runner", () => {
       "--force"
     ], {
       cwd: process.cwd(),
-      encoding: "utf8"
+      encoding: "utf8",
+      env: { ...process.env, WBS_JSON_USE_BUN: "0" }
     });
 
     assert.equal(result.status, 0, result.stderr || result.stdout);
