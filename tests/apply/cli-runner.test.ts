@@ -5,7 +5,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 describe("apply CLI runner", () => {
-  it("runs apply.ts without requiring Node TypeScript strip support", () => {
+  it("runs apply.ts with nested tool imports without Node TypeScript strip support", () => {
     const tempRoot = path.join(process.cwd(), ".tmp");
     mkdirSync(tempRoot, { recursive: true });
     const tempDir = mkdtempSync(path.join(tempRoot, "wbs-json-apply-cli-"));
@@ -52,7 +52,8 @@ describe("apply CLI runner", () => {
       "--force"
     ], {
       cwd: process.cwd(),
-      encoding: "utf8"
+      encoding: "utf8",
+      env: { ...process.env, WBS_JSON_USE_BUN: "0" }
     });
 
     assert.equal(result.status, 0, result.stderr || result.stdout);
