@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "0.1.0",
+  "targetWbsId": "wbs-example",
+  "operations": [
+    {
+      "operation": "setDocumentExtension",
+      "value": {
+        "profile": "Standard"
+      }
+    }
+  ]
+}

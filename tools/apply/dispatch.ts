@@ -3,6 +3,7 @@ import { applyAddNode, applyUpdateNode, applyRenameNode, applyMoveNode, applyDel
 import { applyAddRelation, applyUpdateRelation, applyDeleteRelation } from "./relation-operations.ts";
 import { applyAddArtifact, applyUpdateArtifact, applyDeleteArtifact } from "./artifact-operations.ts";
 import { applyAddResource, applyUpdateResource, applyDeleteResource } from "./resource-operations.ts";
+import { applySetDocumentExtension } from "./document-operations.ts";
 import {
   applySetNodeOutputs,
   applyAddNodeOutput,
@@ -15,6 +16,8 @@ import {
 
 export function applySingleOperation(document: WbsDocument, operation: Operation, ctx: ApplyContext): string | null {
   switch (operation.operation) {
+    case "setDocumentExtension":
+      return applySetDocumentExtension(document, operation);
     case "addNode":
       return applyAddNode(document, operation, ctx);
     case "updateNode":

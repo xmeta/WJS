@@ -28,6 +28,10 @@ See [why.md](./why.md).
 
 ## v0.1 Operations
 
+### Document Operations
+
+- [setDocumentExtension](./document_operations/setDocumentExtension.md)
+
 ### Node Operations
 
 - [addNode](./node_operations/addNode.md)

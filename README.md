@@ -61,6 +61,7 @@ Common WBS node fields include:
 - [Software project WBS](./examples/software-project.json)
 - [Business process improvement WBS](./examples/business-process-improvement.json)
 - [Care workflow system WBS](./examples/care-workflow-system.json)
+- [Document extension change set](./examples/set-document-extension-change-set.json)
 
 ## Validation
 
@@ -130,3 +131,6 @@ AI agents should prefer semantic operations over regenerating a full WBS documen
 This is easier to review than a low-level JSON Patch path such as `/nodes/3/name`, and it avoids accidental rewrites of unrelated data.
 
 For array-like node fields, prefer narrow operations such as `addNodeOutput`, `deleteNodeOutput`, `addAcceptanceCriterion`, `deleteAcceptanceCriterion`, `addTag`, and `deleteTag` when changing one item.
+
+For document-scoped extension configuration, use `setDocumentExtension` to
+replace one reviewed namespace atomically while preserving other namespaces.
