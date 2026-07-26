@@ -75,6 +75,11 @@ type OperationCommon = {
 };
 
 export type Operation =
+  | (OperationCommon & {
+      operation: "setDocumentExtension";
+      namespace: string;
+      value: Record<string, unknown>;
+    })
   | (OperationCommon & { operation: "addNode"; node: WbsNode; position?: SiblingPosition })
   | (OperationCommon & { operation: "updateNode"; nodeId: string; changes: Record<string, unknown> })
   | (OperationCommon & { operation: "renameNode"; nodeId: string; name: string })

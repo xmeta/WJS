@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "0.1.0",
+  "targetWbsId": "wbs-software-project",
+  "changeSetId": "changeset-set-document-extension",
+  "author": "ai-agent",
+  "reason": "Select a reviewed configuration profile without regenerating the WBS document.",
+  "dryRun": true,
+  "operations": [
+    {
+      "operationId": "op-001",
+      "operation": "setDocumentExtension",
+      "namespace": "example",
+      "value": {
+        "profile": "Standard",
+        "settings": {
+          "warningLimit": 700
+        }
+      }
+    }
+  ]
+}

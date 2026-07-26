@@ -58,6 +58,9 @@
     "Operation": {
       "oneOf": [
         {
+          "$ref": "#/$defs/SetDocumentExtensionOperation"
+        },
+        {
           "$ref": "#/$defs/AddNodeOperation"
         },
         {
@@ -724,6 +727,45 @@
           "description": "Human-readable explanation for this operation."
         }
       }
+    },
+    "SetDocumentExtensionOperation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/OperationCommon"
+        },
+        {
+          "type": "object",
+          "required": [
+            "operation",
+            "namespace",
+            "value"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "operationId": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "operation": {
+              "const": "setDocumentExtension"
+            },
+            "namespace": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^\\S+$",
+              "description": "Top-level extension namespace to replace."
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "Complete object value for the selected extension namespace."
+            }
+          }
+        }
+      ]
     },
     "AddNodeOperation": {
       "allOf": [
